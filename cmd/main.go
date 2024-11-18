@@ -21,14 +21,18 @@ func main() {
 		cancel()
 	}
 
-	log := logger.InitLogger(cfg.ApiDebug)
+	_ = logger.InitLogger(cfg.ApiDebug)
 
-	httpServer, err := server.NewServer(cfg, log)
+	httpServer, err := server.NewServer(ctx, cfg)
 	if err != nil {
 		cancel()
 	}
 
-	logger.Info("service started", constants.MainCategory)
+	if httpServer != nil {
+		httpServer.Run()
+	}
+
+	logger.InfoF("service started on %d port", constants.MainCategory, cfg.ApiPort)
 
 	<-ctx.Done()
 
@@ -36,7 +40,7 @@ func main() {
 		if err := httpServer.Shutdown(ctx); err != nil {
 			logger.Error(err.Error(), constants.MainCategory)
 		}
-		logger.Info("server stopped", constants.MainCategory)
+		logger.Info("http-server stopped", constants.MainCategory)
 	}
 
 	logger.Info("service exited", constants.MainCategory)

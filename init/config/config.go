@@ -12,6 +12,12 @@ type Config struct {
 	ApiDebug bool   `mapstructure:"API_DEBUG"`
 	ApiPort  int    `mapstructure:"API_PORT"`
 	ApiEntry string `mapstructure:"API_ENTRY"`
+
+	PostgresqlDSN string `mapstructure:"POSTGRESQL_DSN"`
+
+	MongodbURI        string `mapstructure:"MONGODB_URI"`
+	MongodbDatabase   string `mapstructure:"MONGODB_DATABASE"`
+	MongodbCollection string `mapstructure:"MONGODB_COLLECTION"`
 }
 
 func InitConfig() error {
@@ -19,8 +25,6 @@ func InitConfig() error {
 	viper.SetConfigName(".env")
 	viper.AddConfigPath("./configs")
 	viper.AutomaticEnv()
-
-	viper.
 
 	if err := viper.ReadInConfig(); err != nil {
 		logger.Error(err.Error(), constants.ConfigCategory)

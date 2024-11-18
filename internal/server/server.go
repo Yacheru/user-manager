@@ -2,13 +2,18 @@ package server
 
 import (
 	"context"
+	"errors"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
 	"net/http"
 	"time"
+
+	"github.com/gin-gonic/gin"
+
 	"user-manager/init/config"
 	"user-manager/init/logger"
+	"user-manager/internal/repository/mongodb"
+	"user-manager/internal/repository/postgres"
+	"user-manager/internal/server/http/router"
 	"user-manager/pkg/constants"
 )
 
@@ -16,8 +21,19 @@ type Server struct {
 	http *http.Server
 }
 
-func NewServer(cfg *config.Config, log *logrus.Logger) (*Server, error) {
+func NewServer(ctx context.Context, cfg *config.Config) (*Server, error) {
+	db, err := postgres.NewPostgresConnection(ctx, cfg.PostgresqlDSN)
+	if err != nil {
+		return nil, err
+	}
+
+	coll, err := mongodb.InitMongoDB(ctx, cfg)
+	if err != nil {
+		return nil, err
+	}
+
 	handler := initGin(cfg.ApiDebug)
+	router.NewRouterAndComponents(handler.Group(cfg.ApiEntry), db, coll).Routes()
 
 	return &Server{
 		http: &http.Server{
@@ -32,7 +48,7 @@ func NewServer(cfg *config.Config, log *logrus.Logger) (*Server, error) {
 
 func (s *Server) Run() {
 	go func() {
-		if err := s.http.ListenAndServe(); err != nil {
+		if err := s.http.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			logger.Error(err.Error(), constants.ServerCategory)
 		}
 	}()

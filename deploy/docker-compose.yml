@@ -1,4 +1,15 @@
 services:
+#  user-manager:
+#    user: root
+#    build:
+#      context: ..
+#      dockerfile: ./deploy/Dockerfile
+#    depends_on:
+#      - postgres
+#      - mongodb
+#    networks:
+#      - manager-network
+
   postgres:
     user: root
     image: bitnami/postgresql:16
@@ -15,6 +26,21 @@ services:
       interval: 30s
       timeout: 60s
       retries: 5
+    networks:
+      - manager-network
+
+  mongodb:
+    user: root
+    image: bitnami/mongodb:8.0.3
+    ports:
+      - 27017:27017
+    volumes:
+      - ./mongodb-data:/bitnami/mongodb
+    environment:
+      MONGODB_USERNAME: ${MONGODB_USERNAME:?error}
+      MONGODB_PASSWORD: ${MONGODB_PASSWORD:?error}
+      MONGODB_DATABASE: ${MONGODB_DATABASE:?error}
+      MONGODB_ROOT_PASSWORD: ${MONGODB_ROOT_PASSWORD:?error}
     networks:
       - manager-network
 
