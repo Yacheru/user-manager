@@ -27,6 +27,9 @@ func (u *User) NewUser(ctx context.Context, user *entities.NewUser) (*entities.U
 		INSERT INTO users (uuid, name) VALUES ($1, $2) RETURNING uuid, name, points, referral
 	`
 	if err := u.db.GetContext(ctx, userEntity, query, user.UserID, user.Name); err != nil {
+		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
+			return nil, constants.UserAlreadyExistError
+		}
 		logger.Error(err.Error(), constants.PostgresCategory)
 		return nil, err
 	}

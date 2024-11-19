@@ -11,6 +11,15 @@ import (
 	"user-manager/pkg/constants"
 )
 
+//	@title		User-Manager
+//	@version	1.0
+
+//	@securityDefinitions.apikey	JWT
+//	@in							header
+//	@name						Authorization
+//	@host						localhost
+//	@BasePath					/
+
 func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGKILL)
 	defer cancel()

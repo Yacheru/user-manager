@@ -31,19 +31,16 @@ func NewAdmin(codesMongo repository.CodesMongo, tasksPostgres repository.TasksPo
 
 func (c *Admin) NewCode(ctx context.Context, code *entities.Code) error {
 	savedCode, err := c.codesMongo.FindCode(ctx, code.Code)
-	if err != nil {
-		if !errors.Is(err, constants.CodeNotFoundError) {
-			return err
-		}
-		if err := c.codesMongo.NewCode(ctx, code.Code, code.Reward); err != nil {
-			return err
-		} else {
-			return nil
-		}
+	if err != nil && !errors.Is(err, constants.CodeNotFoundError) {
+		return err
 	}
 
 	if savedCode != nil {
 		return constants.CodeAlreadyExistError
+	}
+
+	if err := c.codesMongo.NewCode(ctx, code.Code, code.Reward); err != nil {
+		return err
 	}
 
 	return nil

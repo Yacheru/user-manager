@@ -1,17 +1,24 @@
 services:
-#  user-manager:
-#    user: root
-#    build:
-#      context: ..
-#      dockerfile: ./deploy/Dockerfile
-#    depends_on:
-#      - postgres
-#      - mongodb
-#    networks:
-#      - manager-network
+  user-manager:
+    user: root
+    container_name: user-manager
+    ports:
+      - ${API_PORT}:${API_PORT}
+    build:
+      context: ..
+      dockerfile: ./deploy/Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongodb:
+        condition: service_started
+    networks:
+      - manager-network
 
   postgres:
     user: root
+    hostname: postgres
+    container_name: postgres
     image: bitnami/postgresql:16
     ports:
       - 5432:5432
@@ -31,6 +38,8 @@ services:
 
   mongodb:
     user: root
+    hostname: mongodb
+    container_name: mongodb
     image: bitnami/mongodb:8.0.3
     ports:
       - 27017:27017

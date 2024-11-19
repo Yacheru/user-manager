@@ -1,0 +1,280 @@
+definitions:
+  entities.Code:
+    properties:
+      code:
+        type: string
+      reward:
+        type: integer
+    required:
+    - code
+    - reward
+    type: object
+  entities.NewUser:
+    properties:
+      name:
+        type: string
+    type: object
+  entities.Task:
+    properties:
+      description:
+        type: string
+      reward:
+        type: integer
+      title:
+        type: string
+    type: object
+  handlers.Response:
+    properties:
+      data: {}
+      message:
+        type: string
+      status:
+        type: integer
+    type: object
+info:
+  contact: {}
+  title: User-Manager
+  version: "1.0"
+paths:
+  /users/:id/referrer:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Referral code
+        in: query
+        name: code
+        required: true
+        type: string
+      - description: User ID (uuid v4)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.Response'
+      security:
+      - JWT: []
+      summary: Use referral code
+      tags:
+      - user
+  /users/:id/status:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: User ID (uuid v4)
+        in: path
+        name: input
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.Response'
+      security:
+      - JWT: []
+      summary: Get user status by user ID
+      tags:
+      - user
+  /users/:id/task/complete:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Task ID (uuid v4)
+        in: query
+        name: task_id
+        required: true
+        type: string
+      - description: User ID (uuid v4)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.Response'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/handlers.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.Response'
+      security:
+      - JWT: []
+      summary: Complete some task
+      tags:
+      - tasks
+  /users/admin/new/code:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: create new referral code
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/entities.Code'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.Response'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/handlers.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.Response'
+      security:
+      - JWT: []
+      summary: Create new referral code
+      tags:
+      - code
+  /users/admin/new/task:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: create new task
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/entities.Task'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.Response'
+      security:
+      - JWT: []
+      summary: Create new task
+      tags:
+      - tasks
+  /users/leaderboard:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 'Default: 10'
+        in: query
+        name: limit
+        type: string
+      - description: 'Default: 0'
+        in: query
+        name: offset
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.Response'
+      security:
+      - JWT: []
+      summary: Get a leaderboard of the richest users
+      tags:
+      - user
+  /users/new:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Name for new user
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/entities.NewUser'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.Response'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/handlers.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.Response'
+      summary: Create new user
+      tags:
+      - user
+securityDefinitions:
+  JWT:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

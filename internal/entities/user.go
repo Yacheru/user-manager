@@ -17,6 +17,6 @@ type Leaderboard struct {
 }
 
 type NewUser struct {
-	UserID *string `json:"id" db:"uuid"`
+	UserID *string `json:"id" db:"uuid" swaggerignore:"true"`
 	Name   string  `json:"name" db:"name"`
 }

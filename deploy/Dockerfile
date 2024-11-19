@@ -13,6 +13,7 @@ FROM alpine
 WORKDIR /user-manager
 
 COPY ./configs/.env /user-manager/configs/.env
+COPY ./migrations /user-manager/migrations
 COPY --from=builder /user-manager/build /user-manager
 
 CMD ["/user-manager/manager.exe"]

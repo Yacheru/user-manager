@@ -3,13 +3,11 @@ package service
 import (
 	"context"
 	"github.com/google/uuid"
-	"strings"
 	"sync"
 	"user-manager/internal/jwt"
 
 	"user-manager/internal/entities"
 	"user-manager/internal/repository"
-	"user-manager/pkg/constants"
 )
 
 type User struct {
@@ -33,9 +31,6 @@ func (u *User) NewUser(ctx context.Context, user *entities.NewUser) (string, err
 
 	_, err := u.userPostgres.NewUser(ctx, user)
 	if err != nil {
-		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
-			return "", constants.UserAlreadyExistError
-		}
 		return "", err
 	}
 

@@ -3,7 +3,11 @@ package router
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"go.mongodb.org/mongo-driver/mongo"
+
+	_ "user-manager/docs"
 	"user-manager/internal/repository"
 	"user-manager/internal/server/http/handlers"
 	"user-manager/internal/server/http/middlewares"
@@ -27,8 +31,9 @@ func NewRouterAndComponents(router *gin.RouterGroup, db *sqlx.DB, coll *mongo.Co
 }
 
 func (r *Router) Routes() {
-	r.router.POST("/new", r.handler.NewUser)
+	r.router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
+	r.router.POST("/new", r.handler.NewUser)
 	{
 		r.router.GET("/leaderboard", middlewares.Auth(), middlewares.Params(), r.handler.Leaderboard)
 
